@@ -4,6 +4,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
+/*
+ * Switching between JPanels: https://search.brave.com/search?q=How+to+switch+between+multiple+JPanels 
+*/
+
 public class CalcFrame extends JFrame {
 	
 	private static final long serialVersionUID = 1L;
@@ -27,6 +31,25 @@ public class CalcFrame extends JFrame {
 	private JButton clearBtn;
 	private JButton clearAllBtn;
 	private JButton deleteBtn;
+	private JButton sqrBtn;
+	private JButton sqrtBtn;
+	private JButton modBtn;
+	private JButton divideBtn;
+	private JButton multiplyBtn;
+	private JButton subtractBtn;
+	private JButton addBtn;
+	private JButton nineBtn;
+	private JButton eightBtn;
+	private JButton sevenBtn;
+	private JButton sixBtn;
+	private JButton fiveBtn;
+	private JButton fourBtn;
+	private JButton threeBtn;
+	private JButton twoBtn;
+	private JButton oneBtn;
+	private JButton zeroBtn;
+	private JButton decimalBtn;
+	private JButton changeSignsBtn;
 	
 	private Font calcFont;
 	
@@ -50,6 +73,27 @@ public class CalcFrame extends JFrame {
 		
 		settingsBtn = new JButton();
 		clearBtn = new JButton();
+		clearAllBtn = new JButton();
+		deleteBtn = new JButton();
+		sqrBtn = new JButton();
+		sqrtBtn = new JButton();
+		modBtn = new JButton();
+		divideBtn = new JButton();
+		multiplyBtn = new JButton();
+		subtractBtn = new JButton();
+		addBtn = new JButton();
+		nineBtn = new JButton();
+		eightBtn = new JButton();
+		sevenBtn = new JButton();
+		sixBtn = new JButton();
+		fiveBtn = new JButton();
+		fourBtn = new JButton();
+		threeBtn = new JButton();
+		twoBtn = new JButton();
+		oneBtn = new JButton();
+		zeroBtn = new JButton();
+		decimalBtn = new JButton();
+		changeSignsBtn = new JButton();
 		
 		calcFont = new Font("Serif", Font.PLAIN, 24);
 		
@@ -228,9 +272,71 @@ public class CalcFrame extends JFrame {
 		
 		deleteBtn.addActionListener(deleteAction);
 		
+		sqrBtn = new JButton();
+		sqrBtn.setText("Sqr(x^2)");
+		
+		Action sqrAction = new AbstractAction() {
+
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				CalcEquations equations = new CalcEquations(display.getText());
+				display.setText(equations.squared());
+			}
+			
+		};
+		
+		sqrBtn.addActionListener(sqrAction);
+		
+		sqrtBtn = new JButton();
+		sqrtBtn.setText("Sqrt (√x)");
+		
+		Action sqrtAction = new AbstractAction() {
+
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				CalcEquations equations = new CalcEquations(display.getText());
+				display.setText(equations.squareRoot());
+			}
+			
+		};
+		
+		sqrtBtn.addActionListener(sqrtAction);
+		
+		modBtn = new JButton();
+		modBtn.setText("Mod(%)");
+		
+		Action modAction = new AbstractAction() {
+
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("%");
+			}
+			
+		};
+		
+		modBtn.addActionListener(modAction);
+		
 		standardSpecOpsPanel.add(clearBtn);
 		standardSpecOpsPanel.add(clearAllBtn);
 		standardSpecOpsPanel.add(deleteBtn);
+		standardSpecOpsPanel.add(sqrBtn);
+		standardSpecOpsPanel.add(sqrtBtn);
+		standardSpecOpsPanel.add(modBtn);
 	}
 	
 	private void scientificSpecOpsPanel() {
@@ -243,11 +349,143 @@ public class CalcFrame extends JFrame {
 		
 		initPanel(opsPanel, Color.GRAY, getMinimumSize(), getPreferredSize());
 		
+		divideBtn = new JButton();
+		divideBtn.setText("/");
+		
+		Action divideAction = new AbstractAction() {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("Pressed Divide Button");
+				
+			}
+			
+		};
+		
+		divideBtn.addActionListener(divideAction);
+		
+		multiplyBtn = new JButton();
+		multiplyBtn.setText("*");
+		
+		Action multiplyAction = new AbstractAction() {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("Pressed Multiply Button");
+				
+			}
+			
+		};
+		
+		multiplyBtn.addActionListener(multiplyAction);
+		
+		subtractBtn = new JButton();
+		subtractBtn.setText("-");
+		
+		Action subtractAction = new AbstractAction() {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("Pressed Subtract Button");
+				
+			}
+			
+		};
+		
+		subtractBtn.addActionListener(subtractAction);
+		
+		addBtn = new JButton();
+		addBtn.setText("+");
+		
+		Action addAction = new AbstractAction() {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("Pressed Add Button");
+				
+			}
+			
+		};
+		
+		addBtn.addActionListener(addAction);
+		
+		opsPanel.add(divideBtn);
+		opsPanel.add(multiplyBtn);
+		opsPanel.add(subtractBtn);
+		opsPanel.add(addBtn);
+		
 	}
 	
 	private void numPanel() {
 		
 		initPanel(numPanel, Color.GRAY, getMinimumSize(), getPreferredSize());
+		
+		createNumBtn(nineBtn, 9, numPanel);
+		createNumBtn(eightBtn, 8, numPanel);
+		createNumBtn(sevenBtn, 7, numPanel);
+		createNumBtn(sixBtn, 6, numPanel);
+		createNumBtn(fiveBtn, 5, numPanel);
+		createNumBtn(fourBtn, 4, numPanel);
+		createNumBtn(threeBtn, 3, numPanel);
+		createNumBtn(twoBtn, 2, numPanel);
+		createNumBtn(oneBtn, 1, numPanel);
+		createNumBtn(zeroBtn, 0, numPanel);
+		
+		decimalBtn = new JButton();
+		decimalBtn.setText(".");
+		
+		Action decimalAction = new AbstractAction() {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				System.out.println(decimalBtn.getText());
+				
+			}
+			
+		};
+		
+		decimalBtn.addActionListener(decimalAction);
+		
+		changeSignsBtn = new JButton();
+		changeSignsBtn.setText("+/-");
+		
+		Action changeSignsAction = new AbstractAction() {
+
+			private static final long serialVersionUID = 1L;
+			
+			boolean isNegative = false;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+				isNegative = !isNegative;
+				
+				if(isNegative) {
+					System.out.println("+");
+				} else {
+					System.out.println("-");
+				}
+				
+				
+			}
+			
+		};
+		
+		changeSignsBtn.addActionListener(changeSignsAction);
+		
+		numPanel.add(decimalBtn);
+		numPanel.add(changeSignsBtn);
+		
 		
 	}
 	
@@ -281,6 +519,33 @@ public class CalcFrame extends JFrame {
 		panel.setMinimumSize(minimumSize);
 		panel.setPreferredSize(preferredSize);
 		panel.setLayout(new GridBagLayout());
+	}
+	
+	private void createNumBtn(JButton numBtn, int number, JPanel panel) {
+		
+		final JButton nBtn = new JButton();
+		
+		numBtn.setText("" + number);
+		
+		nBtn.setText(numBtn.getText());
+		
+		Action numBtnAction = new AbstractAction() {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+				System.out.println(nBtn.getText());
+				
+			}
+			
+		};
+		
+		numBtn.addActionListener(numBtnAction);
+		
+		panel.add(numBtn);
+		
 	}
 	
 }
