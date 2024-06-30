@@ -10,8 +10,14 @@ public class Main {
 		
 		
 		CalcFrame calcWindow = new CalcFrame();
-		
 		calcWindow.createGUI();
+		
+		
+		/*
+		GBCTest gbcTest = new GBCTest();
+		gbcTest.createGUI();
+		*/
+		
 	}
 
 }

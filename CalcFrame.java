@@ -6,38 +6,52 @@ import java.awt.event.*;
 
 /*
  * Switching between JPanels: https://search.brave.com/search?q=How+to+switch+between+multiple+JPanels 
+ * https://docs.oracle.com/javase/tutorial/uiswing/layout/card.html
 */
+
+//Scrap the JComboBox to switch panels. Have one giant panel instead.
 
 public class CalcFrame extends JFrame {
 	
 	private static final long serialVersionUID = 1L;
 	
 	private JPanel backgroundPanel;
-	private JPanel configurationsPanel;
+	
 	private JPanel displayPanel;
-	private JPanel standardPanel;
-	private JPanel scientificPanel;
-	private JPanel settingsPanel;
-	private JPanel standardSpecOpsPanel;
-	private JPanel scientificSpecOpsPanel;
-	private JPanel opsPanel;
-	private JPanel numPanel;
+	private JPanel standardOpsPanel;
+	private JPanel advancedOpsPanel;
+	private JPanel numPadPanel;
+	private JPanel basicOpsPanel;
 	
 	private JTextField display;
 	
-	private JComboBox<String> calcMode;
 	
-	private JButton settingsBtn;
-	private JButton clearBtn;
+	private JPanel innerDisplayPanel;
+	private JPanel innerStandPanel;
+	private JPanel innerAdvPanel;
+	private JPanel innerNumPanel;
+	private JPanel innerBasPanel;
+	
+	private JButton percentageBtn;
 	private JButton clearAllBtn;
 	private JButton deleteBtn;
 	private JButton sqrBtn;
 	private JButton sqrtBtn;
 	private JButton modBtn;
-	private JButton divideBtn;
-	private JButton multiplyBtn;
-	private JButton subtractBtn;
-	private JButton addBtn;
+	
+	private JButton leftParenBtn;
+	private JButton rightParenBtn;
+	private JButton sqrThirdBtn;
+	private JButton anySqrBtn;
+	private JButton anySqrtBtn;
+	private JButton piBtn;
+	private JButton logBtn;
+	private JButton eBtn;
+	private JButton lnBtn;
+	private JButton sinBtn;
+	private JButton cosBtn;
+	private JButton tanBtn;
+	
 	private JButton nineBtn;
 	private JButton eightBtn;
 	private JButton sevenBtn;
@@ -51,59 +65,86 @@ public class CalcFrame extends JFrame {
 	private JButton decimalBtn;
 	private JButton changeSignsBtn;
 	
-	private Font calcFont;
+	private JButton divideBtn;
+	private JButton multiplyBtn;
+	private JButton subtractBtn;
+	private JButton addBtn;
+	private JButton equalsBtn;
 	
-	private GridBagConstraints gbc;
+	private GridBagConstraints outerGBC;
+	private GridBagConstraints innerGBC;
+	private GridBagConstraints standGBC;
+	private GridBagConstraints advGBC;
+	private GridBagConstraints numGBC;
+	private GridBagConstraints basGBC;
 	
 	public CalcFrame() {
 		backgroundPanel = new JPanel();
-		configurationsPanel = new JPanel();
 		displayPanel = new JPanel();
-		standardPanel = new JPanel();
-		scientificPanel = new JPanel();
-		settingsPanel = new JPanel();
-		standardSpecOpsPanel = new JPanel();
-		scientificSpecOpsPanel = new JPanel();
-		opsPanel = new JPanel();
-		numPanel = new JPanel();
+		standardOpsPanel = new JPanel();
+		advancedOpsPanel = new JPanel();
+		numPadPanel = new JPanel();
+		basicOpsPanel = new JPanel();
+		
+		innerDisplayPanel = new JPanel();
+		innerStandPanel = new JPanel();
+		innerAdvPanel = new JPanel();
+		innerNumPanel = new JPanel();
+		innerBasPanel = new JPanel();
 		
 		display = new JTextField();
 		
-		calcMode = new JComboBox<String>();
+		percentageBtn = new JButton("Percent(100%)");
+		clearAllBtn = new JButton("C");
+		deleteBtn = new JButton("DELETE");
+		sqrBtn = new JButton("Sqr (x^2)");
+		sqrtBtn = new JButton("Sqrt (√x)");
+		modBtn = new JButton("Mod(%)");
 		
-		settingsBtn = new JButton();
-		clearBtn = new JButton();
-		clearAllBtn = new JButton();
-		deleteBtn = new JButton();
-		sqrBtn = new JButton();
-		sqrtBtn = new JButton();
-		modBtn = new JButton();
-		divideBtn = new JButton();
-		multiplyBtn = new JButton();
-		subtractBtn = new JButton();
-		addBtn = new JButton();
-		nineBtn = new JButton();
-		eightBtn = new JButton();
-		sevenBtn = new JButton();
-		sixBtn = new JButton();
-		fiveBtn = new JButton();
-		fourBtn = new JButton();
-		threeBtn = new JButton();
-		twoBtn = new JButton();
-		oneBtn = new JButton();
-		zeroBtn = new JButton();
-		decimalBtn = new JButton();
-		changeSignsBtn = new JButton();
+		leftParenBtn = new JButton("(");
+		rightParenBtn = new JButton(")");
+		sqrThirdBtn = new JButton("Sqr (x^3)");
+		anySqrBtn = new JButton("Sqr (x^y)");
+		anySqrtBtn = new JButton("Sqrt (y√x)");
+		piBtn = new JButton("π");
+		logBtn = new JButton("log_10(x)");
+		eBtn = new JButton("e");
+		lnBtn = new JButton("ln");
+		sinBtn = new JButton("sin");
+		cosBtn = new JButton("cos");
+		tanBtn = new JButton("tan");
 		
-		calcFont = new Font("Serif", Font.PLAIN, 24);
+		nineBtn = new JButton("9");
+		eightBtn = new JButton("8");
+		sevenBtn = new JButton("7");
+		sixBtn = new JButton("6");
+		fiveBtn = new JButton("5");
+		fourBtn = new JButton("4");
+		threeBtn = new JButton("3");
+		twoBtn = new JButton("2");
+		oneBtn = new JButton("1");
+		zeroBtn = new JButton("0");
+		decimalBtn = new JButton(".");
+		changeSignsBtn = new JButton("+/-");
 		
-		gbc = new GridBagConstraints();
+		divideBtn = new JButton("÷");
+		multiplyBtn = new JButton("×");
+		subtractBtn = new JButton("−");
+		addBtn = new JButton("+");
+		equalsBtn = new JButton("=");
+		
+		outerGBC = new GridBagConstraints();
+		innerGBC = new GridBagConstraints();
+		standGBC = new GridBagConstraints();
+		advGBC = new GridBagConstraints();
+		numGBC = new GridBagConstraints();
+		basGBC = new GridBagConstraints();
 	}
 
 	public void createGUI() {
 		setTitle("Scientific Calculator");
 		setMinimumSize(new Dimension(500, 600));
-		setPreferredSize(new Dimension(500, 640));
+		setPreferredSize(new Dimension(500, 700));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		setLayout(new BorderLayout());
@@ -115,382 +156,245 @@ public class CalcFrame extends JFrame {
 	}
 
 	private void calcContents() {
-		initPanel(backgroundPanel, Color.WHITE, getMinimumSize(), getPreferredSize());
 		
-		configurationsPanel();
-		displayPanel();
-		standardPanel();
+		backgroundPanel = new JPanel();
+		backgroundPanel.setBackground(Color.WHITE);
+		backgroundPanel.setMinimumSize(getMinimumSize());
+		backgroundPanel.setLayout(new GridBagLayout());
 		
+		displayPanelConts();
+		standOpsPanelConts();
+		advOpsPanelConts();
+		numPanelConts();
+		basicOpsPanelConts();
 		
 		add(backgroundPanel);
 	}
 	
-	private void configurationsPanel() {
+	private void displayPanelConts() {
 		
-		initPanel(configurationsPanel, Color.CYAN, getMinimumSize(), getPreferredSize());
+		setGBC(outerGBC, 0, 0, 1, 3, 1, 1, GridBagConstraints.BOTH, 0, 0);
 		
-		calcMode.addItem("Standard");
-		calcMode.addItem("Scientific");
+		displayPanel = new JPanel();
+		displayPanel.setBackground(Color.DARK_GRAY);
+		displayPanel.setMinimumSize(getMinimumSize());
+		displayPanel.setLayout(new GridBagLayout());
 		
-		configurationsPanel.add(calcMode, gbc);
+		setGBC(innerGBC, 0, 0, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
 		
-		settingsBtn = new JButton();
-		settingsBtn.setText("Settings");
-		
-		Action settingsAction = new AbstractAction() {
-
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				System.out.println("Pressed Settings Button");
-				
-			}
-			
-		};
-		
-		settingsBtn.addActionListener(settingsAction);
-		
-		
-		configurationsPanel.add(settingsBtn, gbc);
-		
-		backgroundPanel.add(configurationsPanel, gbc);
-		
-	}
-	
-	private void displayPanel() {
-		
-		initPanel(displayPanel, Color.MAGENTA, getMinimumSize(), getPreferredSize());
+		innerDisplayPanel = new JPanel();
+		innerDisplayPanel.setBackground(Color.GRAY);
+		innerDisplayPanel.setMinimumSize(getMinimumSize());
+		innerDisplayPanel.setLayout(new GridBagLayout());
 		
 		display = new JTextField();
-		display.setBackground(Color.LIGHT_GRAY);
-		display.setMinimumSize(new Dimension(330, 35));
-		display.setPreferredSize(new Dimension(350, 40));
-		display.setMaximumSize(new Dimension(400, 50));
+		display.setMinimumSize(new Dimension(500, 50));
+		display.setPreferredSize(new Dimension(500, 64));
 		display.setAlignmentX(Component.CENTER_ALIGNMENT);
 		display.setAlignmentY(Component.CENTER_ALIGNMENT);
-		display.setFont(calcFont);
-		display.setHorizontalAlignment(SwingConstants.RIGHT);
+		display.setBackground(Color.LIGHT_GRAY);
 		display.setEditable(false);
 		
-		displayPanel.add(display, gbc);
+		innerDisplayPanel.add(display);
 		
-		backgroundPanel.add(displayPanel, gbc);
-	}
-	
-	private void standardPanel() {
+		displayPanel.add(innerDisplayPanel, innerGBC);
 		
-		initPanel(standardPanel, Color.ORANGE, getMinimumSize(), getPreferredSize());
-		
-		standardSpecOpsPanel();
-		opsPanel();
-		numPanel();
-		
-		standardPanel.add(standardSpecOpsPanel);
-		standardPanel.add(opsPanel);
-		standardPanel.add(numPanel);
-		
-		backgroundPanel.add(standardPanel);
+		backgroundPanel.add(displayPanel, outerGBC);
 		
 	}
 	
-	private void scientificPanel() {
+	private void standOpsPanelConts() {
 		
-		initPanel(scientificPanel, Color.BLUE, getMinimumSize(), getPreferredSize());
+		setGBC(outerGBC, 0, 1, 1, 3, 1, 1, GridBagConstraints.BOTH, 0, 0);
 		
-		scientificSpecOpsPanel();
-		opsPanel();
-		numPanel();
+		standardOpsPanel = new JPanel();
+		standardOpsPanel.setBackground(Color.ORANGE);
+		standardOpsPanel.setMinimumSize(getMinimumSize());
+		standardOpsPanel.setLayout(new GridBagLayout());
 		
-		standardPanel.add(scientificSpecOpsPanel);
-		standardPanel.add(opsPanel);
-		standardPanel.add(numPanel);
+		setGBC(innerGBC, 0, 0, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
 		
-		backgroundPanel.add(scientificPanel);
-	}
-	
-	private void settingsPanel() {
+		innerStandPanel = new JPanel();
+		innerStandPanel.setBackground(Color.ORANGE);
+		innerStandPanel.setMinimumSize(getMinimumSize());
+		innerStandPanel.setLayout(new GridBagLayout());
 		
-		initPanel(settingsPanel, Color.GREEN, getMinimumSize(), getPreferredSize());
+		setGBC(standGBC, 0, 0, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		innerStandPanel.add(percentageBtn, standGBC);
 		
-		backgroundPanel.add(settingsPanel);
+		setGBC(standGBC, 1, 0, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		innerStandPanel.add(clearAllBtn, standGBC);
 		
-	}
-	
-	private void standardSpecOpsPanel() {
+		setGBC(standGBC, 2, 0, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		innerStandPanel.add(deleteBtn, standGBC);
 		
-		initPanel(standardSpecOpsPanel, Color.GRAY, getMinimumSize(), getPreferredSize());
+		setGBC(standGBC, 0, 1, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		innerStandPanel.add(sqrBtn, standGBC);
 		
-		clearBtn = new JButton();
-		clearBtn.setText("CE");
+		setGBC(standGBC, 1, 1, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		innerStandPanel.add(sqrtBtn, standGBC);
 		
-		Action clearAction = new AbstractAction() {
-
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				System.out.println("Pressed Clear Button");
-				
-			}
-			
-		};
+		setGBC(standGBC, 2, 1, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		innerStandPanel.add(modBtn, standGBC);
 		
-		clearBtn.addActionListener(clearAction);
+		standardOpsPanel.add(innerStandPanel, innerGBC);
 		
-		clearAllBtn = new JButton();
-		clearAllBtn.setText("C");
-		
-		Action clearAllAction = new AbstractAction() {
-
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				System.out.println("Pressed Clear All Button");
-				
-			}
-			
-		};
-		
-		clearAllBtn.addActionListener(clearAllAction);
-		
-		deleteBtn = new JButton();
-		deleteBtn.setText("DELETE");
-		
-		Action deleteAction = new AbstractAction() {
-
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				System.out.println("Pressed delete Button");
-				
-			}
-			
-		};
-		
-		deleteBtn.addActionListener(deleteAction);
-		
-		sqrBtn = new JButton();
-		sqrBtn.setText("Sqr(x^2)");
-		
-		Action sqrAction = new AbstractAction() {
-
-			/**
-			 * 
-			 */
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				CalcEquations equations = new CalcEquations(display.getText());
-				display.setText(equations.squared());
-			}
-			
-		};
-		
-		sqrBtn.addActionListener(sqrAction);
-		
-		sqrtBtn = new JButton();
-		sqrtBtn.setText("Sqrt (√x)");
-		
-		Action sqrtAction = new AbstractAction() {
-
-			/**
-			 * 
-			 */
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				CalcEquations equations = new CalcEquations(display.getText());
-				display.setText(equations.squareRoot());
-			}
-			
-		};
-		
-		sqrtBtn.addActionListener(sqrtAction);
-		
-		modBtn = new JButton();
-		modBtn.setText("Mod(%)");
-		
-		Action modAction = new AbstractAction() {
-
-			/**
-			 * 
-			 */
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				System.out.println("%");
-			}
-			
-		};
-		
-		modBtn.addActionListener(modAction);
-		
-		standardSpecOpsPanel.add(clearBtn);
-		standardSpecOpsPanel.add(clearAllBtn);
-		standardSpecOpsPanel.add(deleteBtn);
-		standardSpecOpsPanel.add(sqrBtn);
-		standardSpecOpsPanel.add(sqrtBtn);
-		standardSpecOpsPanel.add(modBtn);
-	}
-	
-	private void scientificSpecOpsPanel() {
-		
-		initPanel(scientificSpecOpsPanel, Color.GRAY, getMinimumSize(), getPreferredSize());
+		backgroundPanel.add(standardOpsPanel, outerGBC);
 		
 	}
 	
-	private void opsPanel() {
+	private void advOpsPanelConts() {
 		
-		initPanel(opsPanel, Color.GRAY, getMinimumSize(), getPreferredSize());
+		setGBC(outerGBC, 0, 2, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
 		
-		divideBtn = new JButton();
-		divideBtn.setText("/");
+		advancedOpsPanel = new JPanel();
+		advancedOpsPanel.setBackground(Color.RED);
+		advancedOpsPanel.setMinimumSize(getMinimumSize());
+		advancedOpsPanel.setLayout(new GridBagLayout());
 		
-		Action divideAction = new AbstractAction() {
-
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				System.out.println("Pressed Divide Button");
-				
-			}
-			
-		};
+		setGBC(innerGBC, 0, 0, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
 		
-		divideBtn.addActionListener(divideAction);
+		innerAdvPanel = new JPanel();
+		innerAdvPanel.setBackground(Color.RED);
+		innerAdvPanel.setMinimumSize(getMinimumSize());
+		innerAdvPanel.setLayout(new GridBagLayout());
 		
-		multiplyBtn = new JButton();
-		multiplyBtn.setText("*");
+		setGBC(advGBC, 0, 0, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		innerAdvPanel.add(sqrThirdBtn, advGBC);
 		
-		Action multiplyAction = new AbstractAction() {
-
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				System.out.println("Pressed Multiply Button");
-				
-			}
-			
-		};
+		setGBC(advGBC, 1, 0, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		innerAdvPanel.add(leftParenBtn, advGBC);
 		
-		multiplyBtn.addActionListener(multiplyAction);
+		setGBC(advGBC, 2, 0, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		innerAdvPanel.add(rightParenBtn, advGBC);
 		
-		subtractBtn = new JButton();
-		subtractBtn.setText("-");
+		setGBC(advGBC, 0, 1, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		innerAdvPanel.add(anySqrBtn, advGBC);
 		
-		Action subtractAction = new AbstractAction() {
-
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				System.out.println("Pressed Subtract Button");
-				
-			}
-			
-		};
+		setGBC(advGBC, 1, 1, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		innerAdvPanel.add(anySqrtBtn, advGBC);
 		
-		subtractBtn.addActionListener(subtractAction);
+		setGBC(advGBC, 2, 1, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		innerAdvPanel.add(piBtn, advGBC);
 		
-		addBtn = new JButton();
-		addBtn.setText("+");
+		setGBC(advGBC, 0, 2, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		innerAdvPanel.add(logBtn, advGBC);
 		
-		Action addAction = new AbstractAction() {
-
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				System.out.println("Pressed Add Button");
-				
-			}
-			
-		};
+		setGBC(advGBC, 1, 2, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		innerAdvPanel.add(eBtn, advGBC);
 		
-		addBtn.addActionListener(addAction);
+		setGBC(advGBC, 2, 2, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		innerAdvPanel.add(lnBtn, advGBC);
 		
-		opsPanel.add(divideBtn);
-		opsPanel.add(multiplyBtn);
-		opsPanel.add(subtractBtn);
-		opsPanel.add(addBtn);
+		setGBC(advGBC, 0, 3, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		innerAdvPanel.add(sinBtn, advGBC);
 		
+		setGBC(advGBC, 1, 3, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		innerAdvPanel.add(cosBtn, advGBC);
+		
+		setGBC(advGBC, 2, 3, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		innerAdvPanel.add(tanBtn, advGBC);
+		
+		advancedOpsPanel.add(innerAdvPanel, innerGBC);
+		
+		backgroundPanel.add(advancedOpsPanel, outerGBC);
 	}
 	
-	private void numPanel() {
+	private void numPanelConts() {
 		
-		initPanel(numPanel, Color.GRAY, getMinimumSize(), getPreferredSize());
+		setGBC(outerGBC, 1, 2, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
 		
-		createNumBtn(nineBtn, 9, numPanel);
-		createNumBtn(eightBtn, 8, numPanel);
-		createNumBtn(sevenBtn, 7, numPanel);
-		createNumBtn(sixBtn, 6, numPanel);
-		createNumBtn(fiveBtn, 5, numPanel);
-		createNumBtn(fourBtn, 4, numPanel);
-		createNumBtn(threeBtn, 3, numPanel);
-		createNumBtn(twoBtn, 2, numPanel);
-		createNumBtn(oneBtn, 1, numPanel);
-		createNumBtn(zeroBtn, 0, numPanel);
+		numPadPanel = new JPanel();
+		numPadPanel.setBackground(Color.CYAN);
+		numPadPanel.setMinimumSize(getMinimumSize());
+		numPadPanel.setLayout(new GridBagLayout());
 		
-		decimalBtn = new JButton();
-		decimalBtn.setText(".");
+		setGBC(innerGBC, 0, 0, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
 		
-		Action decimalAction = new AbstractAction() {
-
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				System.out.println(decimalBtn.getText());
-				
-			}
-			
-		};
+		innerNumPanel = new JPanel();
+		innerNumPanel.setBackground(Color.CYAN);
+		innerNumPanel.setMinimumSize(getMinimumSize());
+		innerNumPanel.setLayout(new GridBagLayout());
 		
-		decimalBtn.addActionListener(decimalAction);
+		setGBC(numGBC, 2, 0, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		innerNumPanel.add(nineBtn, numGBC);
 		
-		changeSignsBtn = new JButton();
-		changeSignsBtn.setText("+/-");
+		setGBC(numGBC, 1, 0, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		innerNumPanel.add(eightBtn, numGBC);
 		
-		Action changeSignsAction = new AbstractAction() {
-
-			private static final long serialVersionUID = 1L;
-			
-			boolean isNegative = false;
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				
-				isNegative = !isNegative;
-				
-				if(isNegative) {
-					System.out.println("+");
-				} else {
-					System.out.println("-");
-				}
-				
-				
-			}
-			
-		};
+		setGBC(numGBC, 0, 0, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		innerNumPanel.add(sevenBtn, numGBC);
 		
-		changeSignsBtn.addActionListener(changeSignsAction);
+		setGBC(numGBC, 2, 1, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		innerNumPanel.add(sixBtn, numGBC);
 		
-		numPanel.add(decimalBtn);
-		numPanel.add(changeSignsBtn);
+		setGBC(numGBC, 1, 1, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		innerNumPanel.add(fiveBtn, numGBC);
 		
+		setGBC(numGBC, 0, 1, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		innerNumPanel.add(fourBtn, numGBC);
 		
+		setGBC(numGBC, 2, 2, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		innerNumPanel.add(threeBtn, numGBC);
+		
+		setGBC(numGBC, 1, 2, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		innerNumPanel.add(twoBtn, numGBC);
+		
+		setGBC(numGBC, 0, 2, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		innerNumPanel.add(oneBtn, numGBC);
+		
+		setGBC(numGBC, 0, 3, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		innerNumPanel.add(zeroBtn, numGBC);
+		
+		setGBC(numGBC, 1, 3, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		innerNumPanel.add(decimalBtn, numGBC);
+		
+		setGBC(numGBC, 2, 3, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		innerNumPanel.add(changeSignsBtn, numGBC);
+		
+		numPadPanel.add(innerNumPanel, innerGBC);
+		
+		backgroundPanel.add(numPadPanel, outerGBC);
 	}
 	
-	/*
+	private void basicOpsPanelConts() {
+		
+		setGBC(outerGBC, 2, 2, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		
+		basicOpsPanel = new JPanel();
+		basicOpsPanel.setBackground(Color.GREEN);
+		basicOpsPanel.setMinimumSize(getMinimumSize());
+		basicOpsPanel.setLayout(new GridBagLayout());
+		
+		setGBC(innerGBC, 0, 0, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		
+		innerBasPanel = new JPanel();
+		innerBasPanel.setBackground(Color.GREEN);
+		innerBasPanel.setMinimumSize(getMinimumSize());
+		innerBasPanel.setLayout(new GridBagLayout());
+		
+		setGBC(basGBC, 0, 0, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		innerBasPanel.add(divideBtn, basGBC);
+		
+		setGBC(basGBC, 0, 1, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		innerBasPanel.add(multiplyBtn, basGBC);
+		
+		setGBC(basGBC, 0, 2, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		innerBasPanel.add(subtractBtn, basGBC);
+		
+		setGBC(basGBC, 0, 3, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		innerBasPanel.add(addBtn, basGBC);
+		
+		setGBC(basGBC, 0, 4, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		innerBasPanel.add(equalsBtn, basGBC);
+		
+		basicOpsPanel.add(innerBasPanel, innerGBC);
+		
+		backgroundPanel.add(basicOpsPanel, outerGBC);
+	}
+	
 	private void setGBC(
+			GridBagConstraints gbc,
 			int gridx, int gridy,
 			int gridheight, int gridwidth,
 			int weightx, int weighty,
@@ -498,53 +402,15 @@ public class CalcFrame extends JFrame {
 			int ipadx, int ipady
 			) {
 		
-		gbc = new gbc();
-		
 		gbc.gridx = gridx;
 		gbc.gridy = gridy;
-		gbc.gridheight = gridheight;
 		gbc.gridwidth = gridwidth;
+		gbc.gridheight = gridheight;
 		gbc.weightx = weightx;
 		gbc.weighty = weighty;
 		gbc.fill = fill;
 		gbc.ipadx = ipadx;
 		gbc.ipady = ipady;
-		
-	}
-	*/
-	
-	private void initPanel(JPanel panel, Color backgroundColor, Dimension minimumSize, Dimension preferredSize) {
-		panel = new JPanel();
-		panel.setBackground(backgroundColor);
-		panel.setMinimumSize(minimumSize);
-		panel.setPreferredSize(preferredSize);
-		panel.setLayout(new GridBagLayout());
-	}
-	
-	private void createNumBtn(JButton numBtn, int number, JPanel panel) {
-		
-		final JButton nBtn = new JButton();
-		
-		numBtn.setText("" + number);
-		
-		nBtn.setText(numBtn.getText());
-		
-		Action numBtnAction = new AbstractAction() {
-
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				
-				System.out.println(nBtn.getText());
-				
-			}
-			
-		};
-		
-		numBtn.addActionListener(numBtnAction);
-		
-		panel.add(numBtn);
 		
 	}
 	
