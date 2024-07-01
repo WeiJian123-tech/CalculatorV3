@@ -5,8 +5,8 @@ import java.awt.*;
 import java.awt.event.*;
 
 /*
- * Switching between JPanels: https://search.brave.com/search?q=How+to+switch+between+multiple+JPanels 
- * https://docs.oracle.com/javase/tutorial/uiswing/layout/card.html
+ * Calculator Keyboard Shortcuts: https://www.webnots.com/keyboard-shortcuts-for-calculator-app-in-windows-10/
+ * Java KeyEvent List: https://docs.oracle.com/javase/7/docs/api///java/awt/event/KeyEvent.html
 */
 
 //Scrap the JComboBox to switch panels. Have one giant panel instead.
@@ -43,7 +43,7 @@ public class CalcFrame extends JFrame {
 	private JButton rightParenBtn;
 	private JButton sqrThirdBtn;
 	private JButton anySqrBtn;
-	private JButton anySqrtBtn;
+	private JButton cbrtBtn;
 	private JButton piBtn;
 	private JButton logBtn;
 	private JButton eBtn;
@@ -95,7 +95,7 @@ public class CalcFrame extends JFrame {
 		display = new JTextField();
 		
 		percentageBtn = new JButton("Percent(100%)");
-		clearAllBtn = new JButton("C");
+		clearAllBtn = new JButton("AC");
 		deleteBtn = new JButton("DELETE");
 		sqrBtn = new JButton("Sqr (x^2)");
 		sqrtBtn = new JButton("Sqrt (√x)");
@@ -105,11 +105,11 @@ public class CalcFrame extends JFrame {
 		rightParenBtn = new JButton(")");
 		sqrThirdBtn = new JButton("Sqr (x^3)");
 		anySqrBtn = new JButton("Sqr (x^y)");
-		anySqrtBtn = new JButton("Sqrt (y√x)");
+		cbrtBtn = new JButton("Cbrt (∛x)");
 		piBtn = new JButton("π");
-		logBtn = new JButton("log_10(x)");
+		logBtn = new JButton("log_10(x)"); //Math.log10
 		eBtn = new JButton("e");
-		lnBtn = new JButton("ln");
+		lnBtn = new JButton("ln"); //Math.log
 		sinBtn = new JButton("sin");
 		cosBtn = new JButton("cos");
 		tanBtn = new JButton("tan");
@@ -173,7 +173,7 @@ public class CalcFrame extends JFrame {
 	
 	private void displayPanelConts() {
 		
-		setGBC(outerGBC, 0, 0, 1, 3, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		setGBC(outerGBC, 0, 0, 1, 3, 0, 0, GridBagConstraints.HORIZONTAL, 0, 0);
 		
 		displayPanel = new JPanel();
 		displayPanel.setBackground(Color.DARK_GRAY);
@@ -192,6 +192,7 @@ public class CalcFrame extends JFrame {
 		display.setPreferredSize(new Dimension(500, 64));
 		display.setAlignmentX(Component.CENTER_ALIGNMENT);
 		display.setAlignmentY(Component.CENTER_ALIGNMENT);
+		display.setHorizontalAlignment(SwingConstants.RIGHT);
 		display.setBackground(Color.LIGHT_GRAY);
 		display.setEditable(false);
 		
@@ -220,21 +221,130 @@ public class CalcFrame extends JFrame {
 		innerStandPanel.setLayout(new GridBagLayout());
 		
 		setGBC(standGBC, 0, 0, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		Action percentageBtnAction = new AbstractAction() {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				CalcEquations equations = new CalcEquations(display.getText());
+				display.setText(equations.percentage());
+			}
+			
+		};
+		
+		percentageBtn.addActionListener(percentageBtnAction);
 		innerStandPanel.add(percentageBtn, standGBC);
 		
 		setGBC(standGBC, 1, 0, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		Action clearAllAction = new AbstractAction() {
+
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				display.setText("");
+			}
+			
+		};
+		
+		clearAllBtn.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+				KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "clearAll");
+		clearAllBtn.getActionMap().put("clearAll", clearAllAction);
+		
+		clearAllBtn.addActionListener(clearAllAction);
 		innerStandPanel.add(clearAllBtn, standGBC);
 		
 		setGBC(standGBC, 2, 0, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		Action deleteAction = new AbstractAction() {
+
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				
+				if(!display.getText().isBlank()) {
+					display.setText(
+							"" + display.getText().substring(0, display.getText().length()-1)
+							);
+				} else {
+					display.setText("0");
+				}
+			}
+			
+		};
+		
+		deleteBtn.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "delete");
+		deleteBtn.getActionMap().put("delete", deleteAction);
+		
+		deleteBtn.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0), "delete");
+		deleteBtn.getActionMap().put("delete", deleteAction);
+		
+		deleteBtn.addActionListener(deleteAction);
 		innerStandPanel.add(deleteBtn, standGBC);
 		
 		setGBC(standGBC, 0, 1, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		Action sqrAction = new AbstractAction() {
+
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				CalcEquations equations = new CalcEquations(display.getText());
+				display.setText(equations.squared());
+			}
+			
+		};
+		
+		sqrBtn.addActionListener(sqrAction);
 		innerStandPanel.add(sqrBtn, standGBC);
 		
 		setGBC(standGBC, 1, 1, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		Action sqrtAction = new AbstractAction() {
+
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				CalcEquations equations = new CalcEquations(display.getText());
+				display.setText(equations.squareRoot());
+			}
+			
+		};
+		
+		sqrtBtn.addActionListener(sqrtAction);
 		innerStandPanel.add(sqrtBtn, standGBC);
 		
 		setGBC(standGBC, 2, 1, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		Action modAction = new AbstractAction() {
+
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				display.setText(display.getText() + " % ");
+				display.setHorizontalAlignment(SwingConstants.RIGHT);
+			}
+			
+		};
+		
+		modBtn.addActionListener(modAction);
 		innerStandPanel.add(modBtn, standGBC);
 		
 		standardOpsPanel.add(innerStandPanel, innerGBC);
@@ -245,7 +355,7 @@ public class CalcFrame extends JFrame {
 	
 	private void advOpsPanelConts() {
 		
-		setGBC(outerGBC, 0, 2, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		setGBC(outerGBC, 0, 2, 1, 1, 1, 1, GridBagConstraints.BOTH, 1, 1);
 		
 		advancedOpsPanel = new JPanel();
 		advancedOpsPanel.setBackground(Color.RED);
@@ -260,39 +370,191 @@ public class CalcFrame extends JFrame {
 		innerAdvPanel.setLayout(new GridBagLayout());
 		
 		setGBC(advGBC, 0, 0, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		Action sqrThirdAction = new AbstractAction() {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				CalcEquations equations = new CalcEquations(display.getText());
+				display.setText(equations.squaredThird());
+			}
+			
+		};
+		sqrThirdBtn.addActionListener(sqrThirdAction);
 		innerAdvPanel.add(sqrThirdBtn, advGBC);
 		
 		setGBC(advGBC, 1, 0, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		Action leftParenAction = new AbstractAction() {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				display.setText(display.getText() + "(");
+			}
+			
+		};
+		
+		leftParenBtn.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+				KeyStroke.getKeyStroke(KeyEvent.VK_LEFT_PARENTHESIS, 0), "leftParen");
+		leftParenBtn.getActionMap().put("leftParen", leftParenAction);
+		
+		leftParenBtn.addActionListener(leftParenAction);
 		innerAdvPanel.add(leftParenBtn, advGBC);
 		
 		setGBC(advGBC, 2, 0, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		Action rightParenAction = new AbstractAction() {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				display.setText(display.getText() + ")");
+			}
+			
+		};
+		
+		rightParenBtn.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+				KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT_PARENTHESIS, 0), "rightParen");
+		rightParenBtn.getActionMap().put("rightParen", rightParenAction);
+		
+		rightParenBtn.addActionListener(rightParenAction);
 		innerAdvPanel.add(rightParenBtn, advGBC);
 		
 		setGBC(advGBC, 0, 1, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		Action anySqrAction = new AbstractAction() {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				display.setText(display.getText() + "^");
+			}
+			
+		};
+		
+		anySqrBtn.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+				KeyStroke.getKeyStroke(KeyEvent.VK_CIRCUMFLEX, 0), "anySqr");
+		anySqrBtn.getActionMap().put("anySqr", rightParenAction);
+		
+		anySqrBtn.addActionListener(anySqrAction);
 		innerAdvPanel.add(anySqrBtn, advGBC);
 		
 		setGBC(advGBC, 1, 1, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
-		innerAdvPanel.add(anySqrtBtn, advGBC);
+		Action cbrtAction = new AbstractAction() {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				CalcEquations equations = new CalcEquations(display.getText());
+				display.setText(equations.cubedRoot());
+			}
+			
+		};
+		
+		cbrtBtn.addActionListener(cbrtAction);
+		innerAdvPanel.add(cbrtBtn, advGBC);
 		
 		setGBC(advGBC, 2, 1, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		Action piAction = new AbstractAction() {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				display.setText(display.getText() + piBtn.getText());
+			}
+			
+		};
+		
+		piBtn.addActionListener(piAction);
 		innerAdvPanel.add(piBtn, advGBC);
 		
 		setGBC(advGBC, 0, 2, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		Action logAction = new AbstractAction() {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				display.setText(display.getText() + "log(");
+			}
+			
+		};
+		logBtn.addActionListener(logAction);
 		innerAdvPanel.add(logBtn, advGBC);
 		
 		setGBC(advGBC, 1, 2, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		Action eAction = new AbstractAction() {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				display.setText(display.getText() + "e");
+			}
+			
+		};
+		eBtn.addActionListener(eAction);
 		innerAdvPanel.add(eBtn, advGBC);
 		
 		setGBC(advGBC, 2, 2, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		Action lnAction = new AbstractAction() {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				display.setText(display.getText() + "ln(");
+			}
+			
+		};
+		
+		lnBtn.addActionListener(lnAction);
 		innerAdvPanel.add(lnBtn, advGBC);
 		
 		setGBC(advGBC, 0, 3, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		Action sinAction = new AbstractAction() {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				display.setText(display.getText() + "sin(");
+			}
+			
+		};
+		sinBtn.addActionListener(sinAction);
 		innerAdvPanel.add(sinBtn, advGBC);
 		
 		setGBC(advGBC, 1, 3, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		Action cosAction = new AbstractAction() {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				display.setText(display.getText() + "cos(");
+			}
+			
+		};
+		cosBtn.addActionListener(cosAction);
 		innerAdvPanel.add(cosBtn, advGBC);
 		
 		setGBC(advGBC, 2, 3, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		Action tanAction = new AbstractAction() {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				display.setText(display.getText() + "tan(");
+			}
+			
+		};
+		tanBtn.addActionListener(tanAction);
 		innerAdvPanel.add(tanBtn, advGBC);
 		
 		advancedOpsPanel.add(innerAdvPanel, innerGBC);
@@ -302,7 +564,7 @@ public class CalcFrame extends JFrame {
 	
 	private void numPanelConts() {
 		
-		setGBC(outerGBC, 1, 2, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		setGBC(outerGBC, 1, 2, 1, 1, 1, 1, GridBagConstraints.BOTH, 1, 1);
 		
 		numPadPanel = new JPanel();
 		numPadPanel.setBackground(Color.CYAN);
@@ -317,39 +579,80 @@ public class CalcFrame extends JFrame {
 		innerNumPanel.setLayout(new GridBagLayout());
 		
 		setGBC(numGBC, 2, 0, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		numberKeys(nineBtn, display, KeyEvent.VK_9, KeyEvent.VK_NUMPAD9, "nine");
 		innerNumPanel.add(nineBtn, numGBC);
 		
 		setGBC(numGBC, 1, 0, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		numberKeys(eightBtn, display, KeyEvent.VK_8, KeyEvent.VK_NUMPAD8, "eight");
 		innerNumPanel.add(eightBtn, numGBC);
 		
 		setGBC(numGBC, 0, 0, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		numberKeys(sevenBtn, display, KeyEvent.VK_7, KeyEvent.VK_NUMPAD7, "seven");
 		innerNumPanel.add(sevenBtn, numGBC);
 		
 		setGBC(numGBC, 2, 1, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		numberKeys(sixBtn, display, KeyEvent.VK_6, KeyEvent.VK_NUMPAD6, "six");
 		innerNumPanel.add(sixBtn, numGBC);
 		
 		setGBC(numGBC, 1, 1, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		numberKeys(fiveBtn, display, KeyEvent.VK_5, KeyEvent.VK_NUMPAD5, "five");
 		innerNumPanel.add(fiveBtn, numGBC);
 		
 		setGBC(numGBC, 0, 1, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		numberKeys(fourBtn, display, KeyEvent.VK_4, KeyEvent.VK_NUMPAD4, "four");
 		innerNumPanel.add(fourBtn, numGBC);
 		
 		setGBC(numGBC, 2, 2, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		numberKeys(threeBtn, display, KeyEvent.VK_3, KeyEvent.VK_NUMPAD3, "three");
 		innerNumPanel.add(threeBtn, numGBC);
 		
 		setGBC(numGBC, 1, 2, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		numberKeys(twoBtn, display, KeyEvent.VK_2, KeyEvent.VK_NUMPAD2, "two");
 		innerNumPanel.add(twoBtn, numGBC);
 		
 		setGBC(numGBC, 0, 2, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		numberKeys(oneBtn, display, KeyEvent.VK_1, KeyEvent.VK_NUMPAD1, "one");
 		innerNumPanel.add(oneBtn, numGBC);
 		
 		setGBC(numGBC, 0, 3, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		numberKeys(zeroBtn, display, KeyEvent.VK_0, KeyEvent.VK_NUMPAD0, "zero");
 		innerNumPanel.add(zeroBtn, numGBC);
 		
 		setGBC(numGBC, 1, 3, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		numberKeys(decimalBtn, display, KeyEvent.VK_PERIOD, KeyEvent.VK_DECIMAL, "decimal");
 		innerNumPanel.add(decimalBtn, numGBC);
 		
 		setGBC(numGBC, 2, 3, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		Action changeSignsBtnAction = new AbstractAction() {
+
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				boolean isNegative = display.getText().contains("-(");
+				
+				if(!isNegative) {
+					display.setText("-(" + display.getText() + ")");
+				} else {
+					display.setText(display.getText().replace("-(", ""));
+					display.setText(display.getText().replace(")", ""));
+				}
+			}
+			
+		};
+		
+		changeSignsBtn.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+				KeyStroke.getKeyStroke(KeyEvent.SHIFT_DOWN_MASK, 0), "swapSigns");
+		changeSignsBtn.getActionMap().put("swapSigns", changeSignsBtnAction);
+		
+		changeSignsBtn.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+				KeyStroke.getKeyStroke(KeyEvent.VK_SHIFT, 0), "swapSigns");
+		changeSignsBtn.getActionMap().put("swapSigns", changeSignsBtnAction);
+		
+		changeSignsBtn.addActionListener(changeSignsBtnAction);
 		innerNumPanel.add(changeSignsBtn, numGBC);
 		
 		numPadPanel.add(innerNumPanel, innerGBC);
@@ -359,7 +662,7 @@ public class CalcFrame extends JFrame {
 	
 	private void basicOpsPanelConts() {
 		
-		setGBC(outerGBC, 2, 2, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		setGBC(outerGBC, 2, 2, 1, 1, 1, 1, GridBagConstraints.BOTH, 1, 1);
 		
 		basicOpsPanel = new JPanel();
 		basicOpsPanel.setBackground(Color.GREEN);
@@ -374,18 +677,45 @@ public class CalcFrame extends JFrame {
 		innerBasPanel.setLayout(new GridBagLayout());
 		
 		setGBC(basGBC, 0, 0, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		operatorKeys(divideBtn, "/", display, KeyEvent.VK_SLASH, KeyEvent.VK_DIVIDE, "divide");
 		innerBasPanel.add(divideBtn, basGBC);
 		
 		setGBC(basGBC, 0, 1, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		operatorKeys(multiplyBtn, "*", display, KeyEvent.VK_ASTERISK, KeyEvent.VK_MULTIPLY, "multiply");
 		innerBasPanel.add(multiplyBtn, basGBC);
 		
 		setGBC(basGBC, 0, 2, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		operatorKeys(subtractBtn, "-", display, KeyEvent.VK_MINUS, KeyEvent.VK_SUBTRACT, "subtract");
 		innerBasPanel.add(subtractBtn, basGBC);
 		
 		setGBC(basGBC, 0, 3, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		operatorKeys(addBtn, "+", display, KeyEvent.VK_PLUS, KeyEvent.VK_ADD, "add");
 		innerBasPanel.add(addBtn, basGBC);
 		
 		setGBC(basGBC, 0, 4, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		equalsBtn.setBackground(new Color(119, 255, 0));
+		
+		Action equalsAction = new AbstractAction() {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				CalcEquations equations = new CalcEquations(display.getText());
+				
+				display.setText(equations.equals());
+			}
+			
+		};
+		
+		equalsBtn.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, 0), "equals");
+		equalsBtn.getActionMap().put("equals", equalsAction);
+		
+		equalsBtn.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "equals");
+		equalsBtn.getActionMap().put("equals", equalsAction);
+		
+		equalsBtn.addActionListener(equalsAction);
+		
 		innerBasPanel.add(equalsBtn, basGBC);
 		
 		basicOpsPanel.add(innerBasPanel, innerGBC);
@@ -411,6 +741,75 @@ public class CalcFrame extends JFrame {
 		gbc.fill = fill;
 		gbc.ipadx = ipadx;
 		gbc.ipady = ipady;
+		
+	}
+	
+	private void numberKeys(
+			JButton numBtn,
+			JTextField display,
+			int vkNum, int vkNumpadNum, String vkName
+			) {
+		
+		Action numBtnAction = new AbstractAction() {
+
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				display.setText(display.getText() + numBtn.getText());
+				display.setHorizontalAlignment(SwingConstants.RIGHT);
+				//System.out.println("Pressed");
+			}
+			
+		};
+		
+		numBtn.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+				KeyStroke.getKeyStroke(vkNum, 0), vkName);
+		numBtn.getActionMap().put(vkName, numBtnAction);
+		
+		numBtn.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+				KeyStroke.getKeyStroke(vkNumpadNum, 0), vkName);
+		numBtn.getActionMap().put(vkName, numBtnAction);
+		
+		numBtn.addActionListener(numBtnAction);
+		
+	}
+	
+	private void operatorKeys(
+			JButton operatorBtn,
+			String opBtnTxt,
+			JTextField display,
+			int vkOp, int vkNumpadOp, 
+			String vkName
+			) {
+		
+		Action operatorAction = new AbstractAction() {
+
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				display.setText(display.getText() + " " + opBtnTxt + " ");
+				display.setHorizontalAlignment(SwingConstants.RIGHT);
+			}
+			
+		};
+		
+		operatorBtn.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+				KeyStroke.getKeyStroke(vkOp, 0), vkName);
+		operatorBtn.getActionMap().put(vkName, operatorAction);
+		
+		operatorBtn.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+				KeyStroke.getKeyStroke(vkNumpadOp, 0), vkName);
+		operatorBtn.getActionMap().put(vkName, operatorAction);
+		
+		operatorBtn.addActionListener(operatorAction);
 		
 	}
 	
