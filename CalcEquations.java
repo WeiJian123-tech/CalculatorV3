@@ -1,13 +1,14 @@
 package calculatorv3;
 
+import java.util.ArrayList;
+import java.util.Stack;
+
 /*
- * Get String from calculator display
- * Split the String into pieces seperated by operators e.i. (+, -, *, /)
- * Reorganize String with precedence/PEMDAS
- * Iterate through the String via a for loop and character switch statement
- * https://stackoverflow.com/a/26969207
- * 
- * Could try to get as a tree
+ * Use stacks for precedence:
+ * https://search.brave.com/search?q=How+to+program+a+calculator+with+precedence+in+java
+ * https://www.tutorialspoint.com/java/java_regular_expressions.htm
+ * https://www.javatpoint.com/convert-infix-to-postfix-notation
+ * https://search.brave.com/search?q=How+to+convert+from+infix+notation+to+postfix+notation+java
 */
 
 public class CalcEquations extends CalcFrame {
@@ -24,231 +25,264 @@ public class CalcEquations extends CalcFrame {
 	}
 	
 	//Method that computes equations given by the user when pressed by the equals button.
-		public String equals() throws NumberFormatException {
-			
-			Double solution = 0.0;
-			String errorMessage = "";
-			
-			try {
-				for(char displayString: displayTxt.toCharArray()) {
-					
-					String beforeOperator = displayTxt.substring(0);
-					String afterOperator = displayTxt.substring(-1);
-					
-					switch(displayString) {
-					case '/':
-						beforeOperator = displayTxt.substring(0, displayTxt.indexOf("/"));
-						afterOperator = displayTxt.substring(displayTxt.indexOf("/"), displayTxt.length() - 1);
-						solution = divide(beforeOperator, afterOperator);
-						break;
-					case '*':
-						beforeOperator = displayTxt.substring(0, displayTxt.indexOf("*"));
-						afterOperator = displayTxt.substring(displayTxt.indexOf("*"), displayTxt.length() - 1);
-						solution = multiply(beforeOperator, afterOperator);
-						break;
-					case '-':
-						
-						if(displayTxt.contains("-(")) {
-							beforeOperator = displayTxt.substring(displayTxt.indexOf("-("), displayTxt.indexOf("-"));
-							afterOperator = displayTxt.substring(displayTxt.indexOf(beforeOperator), displayTxt.indexOf(")") - 1);
-							solution = multiply("-1", beforeOperator + afterOperator);
-						} else {
-							beforeOperator = displayTxt.substring(0, displayTxt.indexOf("-"));
-							afterOperator = displayTxt.substring(displayTxt.indexOf("-"), displayTxt.length() - 1);
-							solution = subtract(beforeOperator, afterOperator);
-						}
-						
-						break;
-					case '+':
-						beforeOperator = displayTxt.substring(0, displayTxt.indexOf("+"));
-						afterOperator = displayTxt.substring(displayTxt.indexOf("+"), displayTxt.length());
-						solution = add(beforeOperator, afterOperator);
-						break;
-					case '%':
-						beforeOperator = displayTxt.substring(0, displayTxt.indexOf("%"));
-						afterOperator = displayTxt.substring(displayTxt.indexOf("%"), displayTxt.length() - 1);
-						solution = module(beforeOperator, afterOperator);
-						break;
-					default:
-						break;
-					}
+	public String equals() {
+		
+		ArrayList<Character> infixArr = new ArrayList<>();
+		Stack<Character> opStack = new Stack<>();
+		Stack<String> postfix = new Stack<>();
+		
+		double solution = 0.0;
+		
+        //Remove whitespace
+		for(char i: displayTxt.toCharArray()) {
+			if(!Character.isWhitespace(i)) {
+				infixArr.add(i);
+			}
+		}
+		
+		//Convert to postfix notation
+		for(char c: infixArr) {
+			if (Character.isLetterOrDigit(c)) {
+                postfix.push(Character.toString(c));
+            } else if (c == '(') {
+                opStack.push(c);
+            } else if (c == ')') {
+                while (!opStack.isEmpty() && opStack.peek() != '(') {
+                    //postfix.push(Character.toString(opStack.pop()));
+                    
+                    if(postfix.size() >= 3) {
+                    	char operator = opStack.pop();
+                        double topOperand = Double.parseDouble(postfix.pop());
+                        double bottomOperand = Double.parseDouble(postfix.pop());
+                        
+                        solution = performOperation(bottomOperand, topOperand, operator);
+                        
+                        postfix.push(String.valueOf(solution));
+                    } else {
+                    	postfix.push(Character.toString(opStack.pop()));
+                    }
+                }
+                
+                opStack.pop(); // Remove the '('
+            } else {
+				
+				while (!opStack.isEmpty() && getPrecedence(opStack.peek()) >= getPrecedence(c)) {
+				    postfix.push(Character.toString(opStack.pop()));
 				}
 				
-				return String.valueOf(solution);
-			} catch(NumberFormatException f) {
-				errorMessage = "Invalid Input";
-				System.out.println(f.toString());
-			} catch(Exception f) {
-				errorMessage = "Undefined";
-				System.out.println(f.toString());
-			}
-			
-			
-			
+				
+				//Change this to calculate bottom element with top element of postfix stack.
+				if(postfix.size() >= 3) {
+					String postfixOp = postfix.pop();
+					char operator = postfixOp.charAt(0);
+					double topOperand = Double.parseDouble(postfix.pop());
+					double bottomOperand = Double.parseDouble(postfix.pop());
+		       	
+					solution = performOperation(bottomOperand, topOperand, operator);
+					
+					postfix.push(String.valueOf(solution));
+					
+				}
+				
+				
+				opStack.push(c);
+				
+            }
+		}
+		
+		while (!opStack.isEmpty()) {
 			/*
-			try {
-				
-				if(opDisTxt.contains("+")) {
-					solution = add(prevNumDisTxt, displayTxt);
-				}
-				
-				if(opDisTxt.contains("-")) {
-					solution = subtract(prevNumDisTxt, displayTxt);
-				}
-				
-				if(opDisTxt.contains("*")) {
-					solution = multiply(prevNumDisTxt, displayTxt);
-				}
-				
-				if(opDisTxt.contains("/")) {
-					solution = divide(prevNumDisTxt, displayTxt);
-				}
-				
-				if(opDisTxt.contains("%")) {
-					solution = module(prevNumDisTxt, displayTxt);
-				}
-				
-				//Return the String value of the solution that was originally a double value.
-				return String.valueOf(solution);
-				
-			} catch(NumberFormatException f) {
-				errorMessage = "Invalid Input";
-				System.out.println(f.toString());
-			} catch(Exception f) {
-				errorMessage = "Undefined";
-				System.out.println(f.toString());
-			}
-			*/
+			char currentOperator = opStack.pop();
+            postfix.push(Character.toString(currentOperator));
+            */
 			
-			//Returns an error message if the calculator could not compute the equation.
-			return errorMessage;
-		}
+			char operator = opStack.pop();
+			double topOperand = Double.parseDouble(postfix.pop());
+			double bottomOperand = Double.parseDouble(postfix.pop());
+       	
+			solution = performOperation(bottomOperand, topOperand, operator);
+			
+			postfix.push(String.valueOf(solution));
+			
+        }
 		
-		//Method that calculates equations that contain an add (+) symbol.
-		public double add(String firstAddend, String secondAddend) 
-				throws NumberFormatException, StringIndexOutOfBoundsException {
-			
-			double num1 = Double.parseDouble(
-					firstAddend
-					);
-			double num2 = Double.parseDouble(
-					secondAddend
-					);
-			
-			return (num1) + (num2);
-		}
 		
-		//Method that calculates equations that contain a minus (−) symbol.
-		public double subtract(String minuend, String subtrahend) throws NumberFormatException, StringIndexOutOfBoundsException {
-			
-			double num1 = Double.parseDouble(
-					minuend
-					);
-			double num2 = Double.parseDouble(
-					subtrahend
-					);
-			
-			return (num1) - (num2);
-		}
 		
-		//Method that calculates equations that contain a multiply (*) symbol.
-		public double multiply(String multiplicand, String multiplier) throws NumberFormatException, StringIndexOutOfBoundsException {
-			
-			double num1 = Double.parseDouble(
-					multiplicand
-					);
-			double num2 = Double.parseDouble(
-					multiplier
-					);
-			
-			return (num1) * (num2);
+		/*
+		for(char iA: infixArr) {
+			System.out.println(iA);
 		}
+		*/
 		
-		//Method that calculates equations that contain a divide (/) symbol.
-		public double divide(String dividend, String divisor) throws NumberFormatException, StringIndexOutOfBoundsException {
-			
-			double num1 = Double.parseDouble(
-					dividend
-					);
-			double num2 = Double.parseDouble(
-					divisor
-					);
-			
-			return (num1) / (num2);
+		//return postfix.toString();
+		
+		String finalSolution = postfix.firstElement();
+		
+		return finalSolution;
+	}
+	
+	public int getPrecedence(char op) {
+		switch (op) {
+			case '^':
+				return 3;
+			case '*':
+				return 2;
+			case '/':
+				return 2;
+			case '%':
+				return 2;
+			case '+':
+				return 1;
+			case '-':
+				return 1;
+			default:
+				return 0;
 		}
+	}
+	
+	public double performOperation(double num1, double num2, char op) {
+	    switch (op) {
+	        case '+':
+	            return num1 + num2;
+	        case '-':
+	            return num1 - num2;
+	        case '*':
+	            return num1 * num2;
+	        case '/':
+                return num1 / num2;
+	        case '%':
+	        	return num1 % num2;
+	        case '^':
+	        	return Math.pow(num1, num2);
+            default:
+                return 0.0;
+	        }
+	}
 		
-		//Method that calculates equations the contain a module (%) symbol.
-		public double module(String a, String b) throws NumberFormatException, StringIndexOutOfBoundsException {
-			
-			double num1 = Double.parseDouble(
-					a
-					);
-			double num2 = Double.parseDouble(
-					b
-					);
-			
-			return (num1) % (num2);
-		}
+	//Method that calculates equations that contain an add (+) symbol.
+	public double add(String firstAddend, String secondAddend) 
+			throws NumberFormatException, StringIndexOutOfBoundsException {
 		
-		//Method that computes the percentage of a number and returns the solution to the calculator screen.
-		public String percentage() throws NumberFormatException, StringIndexOutOfBoundsException {
-			
-			Double result = 0.0;
-			
-			result = (Double.valueOf(displayTxt)) * 100;
-			
-			return String.valueOf(result);
-		}
+		double num1 = Double.parseDouble(
+				firstAddend
+				);
+		double num2 = Double.parseDouble(
+				secondAddend
+				);
 		
-		//Method that computes the square of a number and returns the solution to the calculator screen.
-		public String squared() throws NumberFormatException, StringIndexOutOfBoundsException {
-			
-			Double result = 0.0;
-			
-			result = Math.pow((Double.valueOf(displayTxt)), 2);
-			
-			return String.valueOf(result);
-		}
+		return (num1) + (num2);
+	}
+	
+	//Method that calculates equations that contain a minus (−) symbol.
+	public double subtract(String minuend, String subtrahend) throws NumberFormatException, StringIndexOutOfBoundsException {
 		
-		//Method that computes the square root of a number and returns the solution to the calculator screen.
-		public String squareRoot() throws NumberFormatException, StringIndexOutOfBoundsException {
-			
-			Double result = 0.0;
-			
-			result = Math.sqrt((Double.valueOf(displayTxt)));
-			
-			return String.valueOf(result);
-		}
+		double num1 = Double.parseDouble(
+				minuend
+				);
+		double num2 = Double.parseDouble(
+				subtrahend
+				);
 		
-		//Method that computes the square of a number to the third power and returns the solution to the calculator screen.
-		public String squaredThird() throws NumberFormatException, StringIndexOutOfBoundsException {
-			
-			Double result = 0.0;
-			
-			result = Math.pow((Double.valueOf(displayTxt)), 3);
-			
-			return String.valueOf(result);
-		}
+		return (num1) - (num2);
+	}
+	
+	//Method that calculates equations that contain a multiply (*) symbol.
+	public double multiply(String multiplicand, String multiplier) throws NumberFormatException, StringIndexOutOfBoundsException {
 		
-		//Method that computes a number to an exponential power and returns the solution to the calculator screen.
-		public String anySqr(String base, String exponent) throws NumberFormatException, StringIndexOutOfBoundsException {
-			
-			Double result = 0.0;
-			
-			result = Math.pow(Double.parseDouble(base), Double.parseDouble(exponent));
-			
-			return String.valueOf(result);
-		}
+		double num1 = Double.parseDouble(
+				multiplicand
+				);
+		double num2 = Double.parseDouble(
+				multiplier
+				);
 		
-		//Method that computes the cubed root of a number and returns the solution to the calculator screen.
-		public String cubedRoot() throws NumberFormatException, StringIndexOutOfBoundsException {
-			
-			Double result = 0.0;
-			
-			result = Math.cbrt(Double.valueOf(displayTxt));
-			
-			return String.valueOf(result);
-		}
+		return (num1) * (num2);
+	}
+	
+	//Method that calculates equations that contain a divide (/) symbol.
+	public double divide(String dividend, String divisor) throws NumberFormatException, StringIndexOutOfBoundsException {
 		
+		double num1 = Double.parseDouble(
+				dividend
+				);
+		double num2 = Double.parseDouble(
+				divisor
+				);
+		
+		return (num1) / (num2);
+	}
+	
+	//Method that calculates equations the contain a module (%) symbol.
+	public double module(String a, String b) throws NumberFormatException, StringIndexOutOfBoundsException {
+		
+		double num1 = Double.parseDouble(
+				a
+				);
+		double num2 = Double.parseDouble(
+				b
+				);
+		
+		return (num1) % (num2);
+	}
+	
+	//Method that computes the percentage of a number and returns the solution to the calculator screen.
+	public String percentage() throws NumberFormatException, StringIndexOutOfBoundsException {
+		
+		Double result = 0.0;
+		
+		result = (Double.valueOf(displayTxt)) * 100;
+		
+		return String.valueOf(result);
+	}
+	
+	//Method that computes the square of a number and returns the solution to the calculator screen.
+	public String squared() throws NumberFormatException, StringIndexOutOfBoundsException {
+		
+		Double result = 0.0;
+		
+		result = Math.pow((Double.valueOf(displayTxt)), 2);
+		
+		return String.valueOf(result);
+	}
+	
+	//Method that computes the square root of a number and returns the solution to the calculator screen.
+	public String squareRoot() throws NumberFormatException, StringIndexOutOfBoundsException {
+		
+		Double result = 0.0;
+		
+		result = Math.sqrt((Double.valueOf(displayTxt)));
+		
+		return String.valueOf(result);
+	}
+	
+	//Method that computes the square of a number to the third power and returns the solution to the calculator screen.
+	public String squaredThird() throws NumberFormatException, StringIndexOutOfBoundsException {
+		
+		Double result = 0.0;
+		
+		result = Math.pow((Double.valueOf(displayTxt)), 3);
+		
+		return String.valueOf(result);
+	}
+	
+	//Method that computes a number to an exponential power and returns the solution to the calculator screen.
+	public String anySqr(String base, String exponent) throws NumberFormatException, StringIndexOutOfBoundsException {
+		
+		Double result = 0.0;
+		
+		result = Math.pow(Double.parseDouble(base), Double.parseDouble(exponent));
+		
+		return String.valueOf(result);
+	}
+	
+	//Method that computes the cubed root of a number and returns the solution to the calculator screen.
+	public String cubedRoot() throws NumberFormatException, StringIndexOutOfBoundsException {
+		
+		Double result = 0.0;
+		
+		result = Math.cbrt(Double.valueOf(displayTxt));
+		
+		return String.valueOf(result);
+	}
 
 }
