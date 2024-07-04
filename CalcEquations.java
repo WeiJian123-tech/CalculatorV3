@@ -32,6 +32,7 @@ public class CalcEquations extends CalcFrame {
 		Stack<String> postfix = new Stack<>();
 		
 		double solution = 0.0;
+		double specialSolution = 0.0;
 		
         //Remove whitespace
 		for(char i: displayTxt.toCharArray()) {
@@ -40,10 +41,39 @@ public class CalcEquations extends CalcFrame {
 			}
 		}
 		
+		
+		
 		//Convert to postfix notation
 		for(char c: infixArr) {
 			if (Character.isLetterOrDigit(c)) {
-                postfix.push(Character.toString(c));
+				
+				if(!(infixArr.size() <= 1)) {
+					switch(c) {
+						case 'e':
+							postfix.push(String.valueOf(Math.E));
+							opStack.push('*');
+							break;
+						case 'π':
+							postfix.push(String.valueOf(Math.PI));
+							opStack.push('*');
+							break;
+						default:
+							postfix.push(Character.toString(c));
+					}
+				} else {
+					switch(c) {
+						case 'e':
+							postfix.push(String.valueOf(Math.E));
+							break;
+						case 'π':
+							postfix.push(String.valueOf(Math.PI));
+							break;
+						default:
+							postfix.push(Character.toString(c));
+					}
+				}
+                
+				//Turn else if statement into else statement and use switch statement for '(' and ')' conditions
             } else if (c == '(') {
                 opStack.push(c);
             } else if (c == ')') {
