@@ -2,6 +2,7 @@ package calculatorv3;
 
 import java.util.ArrayList;
 import java.util.Stack;
+import java.util.regex.Pattern;
 
 /*
  * Use stacks for precedence:
@@ -24,15 +25,160 @@ public class CalcEquations extends CalcFrame {
 		this.displayTxt = displayTxt;
 	}
 	
-	//Method that computes equations given by the user when pressed by the equals button.
+	public String equals() {
+		
+		ArrayList<Character> displayChars = new ArrayList<>();
+		ArrayList<String> joinedChars = new ArrayList<>();
+		
+		for(char characters: displayTxt.toCharArray()) {
+			if(!Character.isWhitespace(characters)) {
+				displayChars.add(characters);
+			}
+		}
+		
+		//Joins characters together such as 123456 and 758
+		StringBuilder sb = new StringBuilder();
+		
+		for(char characters: displayChars) {
+			if(Character.isLetterOrDigit(characters)) {
+				switch(characters) {
+					case 'e':
+					case 'π':
+						
+						insertOperator(sb, joinedChars, characters);
+						sb = new StringBuilder();
+						
+						/*
+						if(!sb.isEmpty()) {
+							joinedChars.add(sb.toString());
+						}
+						
+						sb = new StringBuilder();
+						joinedChars.add(Character.toString(characters));
+						*/
+						break;
+					default:
+						sb.append(characters);
+						break;
+				}
+				
+				if(
+						sb.toString().equalsIgnoreCase("sin") || 
+						sb.toString().equalsIgnoreCase("cos") ||
+						sb.toString().equalsIgnoreCase("tan") ||
+						sb.toString().equalsIgnoreCase("log") ||
+						sb.toString().equalsIgnoreCase("ln")
+						) {
+					joinedChars.add(sb.toString());
+					sb = new StringBuilder();
+				}
+			} else {
+				switch(characters) {
+					case '(':
+						joinedChars.add(Character.toString(characters));
+						sb = new StringBuilder();
+						break;
+					case ')':
+					case '+':
+					case '-':
+					case '*':
+					case '/':
+					case '%':
+					case '^':
+						insertOperator(sb, joinedChars, characters);
+						sb = new StringBuilder();
+						break;
+					case '.':
+						sb.append(characters);
+						break;
+					default:
+						joinedChars.add(sb.toString());
+						sb = new StringBuilder();
+						break;
+				}
+			}
+		}
+		
+		/*
+		for(int i = 0; i < displayChars.size(); i++) {
+			if(Character.isLetterOrDigit(displayChars.get(i))) {
+				if(displayChars.get(i).equals('e') || displayChars.get(i).equals('π')) {
+					
+					if(!sb.isEmpty()) {
+						joinedChars.add(sb.toString());
+					}
+					
+					sb = new StringBuilder();
+					joinedChars.add(Character.toString(displayChars.get(i)));
+				} else {
+					sb.append(displayChars.get(i));
+				}
+				
+				if(
+						sb.toString().equalsIgnoreCase("sin") || 
+						sb.toString().equalsIgnoreCase("cos") ||
+						sb.toString().equalsIgnoreCase("tan") ||
+						sb.toString().equalsIgnoreCase("log") ||
+						sb.toString().equalsIgnoreCase("ln")
+						) {
+					joinedChars.add(sb.toString());
+					sb = new StringBuilder();
+				}
+				
+			} else if(displayChars.get(i).equals('(')) {
+				joinedChars.add(Character.toString(displayChars.get(i)));
+			} else if(displayChars.get(i).equals(')')) {
+				
+				if(!sb.isEmpty()) {
+					joinedChars.add(sb.toString());
+				}
+				
+				sb = new StringBuilder();
+				joinedChars.add(Character.toString(displayChars.get(i)));
+			} else if(
+					displayChars.get(i).equals('+') || displayChars.get(i).equals('-') ||
+					displayChars.get(i).equals('*') || displayChars.get(i).equals('/') ||
+					displayChars.get(i).equals('%') || displayChars.get(i).equals('^')
+					) {
+				
+				if(!sb.isEmpty()) {
+					joinedChars.add(sb.toString());
+				}
+				
+				sb = new StringBuilder();
+				joinedChars.add(Character.toString(displayChars.get(i)));
+			} else if(displayChars.get(i).equals('.')) {
+				sb.append(displayChars.get(i));
+			} else {
+				joinedChars.add(sb.toString());
+				sb = new StringBuilder();
+			}
+		}
+		*/
+		
+		if(!sb.isEmpty()) {
+			joinedChars.add(sb.toString());
+		}
+		
+		
+		
+		return joinedChars.toString();
+	}
+	
+	public void insertOperator(StringBuilder sb, ArrayList<String> expressionMaker, char c) {
+		if(!sb.isEmpty()) {
+			expressionMaker.add(sb.toString());
+		}
+		
+		expressionMaker.add(Character.toString(c));
+	}
+	
+	/*
+	//Does not work. Skips last two elements in character array.
 	public String equals() {
 		
 		ArrayList<Character> infixArr = new ArrayList<>();
-		Stack<Character> opStack = new Stack<>();
-		Stack<String> postfix = new Stack<>();
-		
-		double solution = 0.0;
-		double specialSolution = 0.0;
+		ArrayList<String> newInfixArr = new ArrayList<>();
 		
         //Remove whitespace
 		for(char i: displayTxt.toCharArray()) {
@@ -41,7 +187,173 @@ public class CalcEquations extends CalcFrame {
 			}
 		}
 		
+		for(int i = 0; i < infixArr.size()-2; i++) {
+			
+			String specOpTxt = infixArr.get(i) + "" + infixArr.get(i+1) + "" + infixArr.get(i+2);
+			
+			switch(infixArr.get(i)) {
+				case 'l':
+					//if log_10(x)
+					if(infixArr.get(i+1).equals('o') && infixArr.get(i+2).equals('g')) {
+						newInfixArr.add(specOpTxt);
+					} else {
+						//if ln(x)
+						specOpTxt = infixArr.get(i) + "" + infixArr.get(i+1);
+						newInfixArr.add(specOpTxt);
+					}
+					
+					break;
+				case 's':
+					//sin(x)
+					//Prevents registering as cos(x) when infixArr character element is 's'.
+					if(infixArr.get(i+1).equals('i') && infixArr.get(i+2).equals('n')) {
+						newInfixArr.add(specOpTxt);
+					}
+					
+					break;
+				case 'c':
+					//cos(x)
+					//Prevents registering as sin(x) when infixArr character element is 's'.
+					if(infixArr.get(i+1).equals('o') && infixArr.get(i+2).equals('s')) {
+						newInfixArr.add(specOpTxt);
+					}
+					
+					break;
+				case 't':
+					//tan(x)
+					newInfixArr.add(specOpTxt);
+					break;
+				case 'e':
+					newInfixArr.add(String.valueOf(Math.E));
+					break;
+				case 'π':
+					newInfixArr.add(String.valueOf(Math.PI));
+					break;
+				default:
+					newInfixArr.add(infixArr.get(i) + "");
+			}
+		}
 		
+		//Add remaining two elements from array.
+		newInfixArr.add(infixArr.get(infixArr.size()-1) + "");
+		newInfixArr.add(infixArr.get(infixArr.size()) + "");
+		
+		return "0";
+		
+	}
+	*/
+	
+	/*
+	public String equals() {
+		
+		String equation = "";
+		
+		//Remove whitespace
+		for(char i: displayTxt.toCharArray()) {
+			if(!Character.isWhitespace(i)) {
+				equation += i;
+			}
+		}
+		
+		//System.out.println(equation);
+		String[] equationParts = equation.split("[\\+\\-\\*\\/\\%\\^]");
+		
+		double argument = 0.0;
+		double logResult = 0.0, lnResult = 0.0, sinResult = 0.0, cosResult = 0.0, tanResult = 0.0;
+		
+		for(String s: equationParts) {
+			if(s.contains("log(")) {
+				
+				//In case of e or π within argument.
+				argument = specialResults(s, argument);
+				
+				logResult = Math.log10(argument);
+				
+				s = String.valueOf(logResult);
+				
+			} else if(s.contains("ln(")) {
+				
+				argument = specialResults(s, argument);
+				
+				lnResult = Math.log(argument);
+				
+				s = String.valueOf(lnResult);
+				
+			} else if(s.contains("sin(")) {
+				
+				argument = specialResults(s, argument);
+				
+				sinResult = Math.sin(argument);
+				
+				s = String.valueOf(sinResult);
+				
+			} else if(s.contains("cos(")) {
+				
+				argument = specialResults(s, argument);
+				
+				cosResult = Math.sin(argument);
+				
+				s = String.valueOf(cosResult);
+				
+			} else if(s.contains("tan(")) {
+				
+				argument = specialResults(s, argument);
+				
+				tanResult = Math.sin(argument);
+				
+				s = String.valueOf(tanResult);
+				
+			}
+			
+			System.out.println("s: " + s);
+		}
+		
+		for(String t: equationParts) {
+			System.out.println(t);
+		}
+		
+		System.out.println("equation length: " + equationParts.length);
+		System.out.println("Log Result: " + logResult);
+		System.out.println("sin Result: " + sinResult);
+		
+		return "";
+	}
+	
+	public double specialResults(String portion, double argument) {
+		String[] specialOperation = portion.split("[\\(\\)]");
+		
+		switch(specialOperation[1]) {
+			case "e":
+				argument = Math.E;
+				break;
+			case "π":
+				argument = Math.PI;
+				break;
+			default:
+				argument = Double.valueOf(specialOperation[1]);
+				break;
+		}
+		
+		return argument;
+	}
+	*/
+	
+	/*
+	//Method that computes equations given by the user when pressed by the equals button.
+	public String equals() {
+		
+		ArrayList<Character> infixArr = new ArrayList<>();
+		Stack<Character> opStack = new Stack<>();
+		Stack<String> postfix = new Stack<>();
+		
+		double solution = 0.0;
+		
+        //Remove whitespace
+		for(char i: displayTxt.toCharArray()) {
+			if(!Character.isWhitespace(i)) {
+				infixArr.add(i);
+			}
+		}
 		
 		//Convert to postfix notation
 		for(char c: infixArr) {
@@ -121,10 +433,10 @@ public class CalcEquations extends CalcFrame {
 		}
 		
 		while (!opStack.isEmpty()) {
-			/*
-			char currentOperator = opStack.pop();
-            postfix.push(Character.toString(currentOperator));
-            */
+			
+			//char currentOperator = opStack.pop();
+            //postfix.push(Character.toString(currentOperator));
+            
 			
 			char operator = opStack.pop();
 			double topOperand = Double.parseDouble(postfix.pop());
@@ -136,20 +448,13 @@ public class CalcEquations extends CalcFrame {
 			
         }
 		
-		
-		
-		/*
-		for(char iA: infixArr) {
-			System.out.println(iA);
-		}
-		*/
-		
 		//return postfix.toString();
 		
 		String finalSolution = postfix.firstElement();
 		
 		return finalSolution;
 	}
+	*/
 	
 	public int getPrecedence(char op) {
 		switch (op) {
