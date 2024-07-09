@@ -177,7 +177,12 @@ public class CalcEquations extends CalcFrame {
 			    					opStack.peek().equalsIgnoreCase("ln") ||
 			    					opStack.peek().equalsIgnoreCase("sin") ||
 			    					opStack.peek().equalsIgnoreCase("cos") ||
-			    					opStack.peek().equalsIgnoreCase("tan")
+			    					opStack.peek().equalsIgnoreCase("tan") ||
+			    					(
+			    							opStack.peek().equalsIgnoreCase("-") && 
+			    							postfix.peek().matches("\\d+(\\.\\d+)?")
+			    							)
+			    					
 		    					)
 	    					) {
 		    				String operator = opStack.pop();
@@ -407,6 +412,9 @@ public class CalcEquations extends CalcFrame {
 				return Math.cos(argument);
 			case "tan":
 				return Math.cos(argument);
+			case "-":
+				//Can only get the negative value of one number without an equation inside parentheses.
+				return (-1) * argument;
 			default:
 				return 0.0;
 		}
