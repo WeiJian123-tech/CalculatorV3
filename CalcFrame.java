@@ -9,8 +9,6 @@ import java.awt.event.*;
  * Java KeyEvent List: https://docs.oracle.com/javase/7/docs/api///java/awt/event/KeyEvent.html
 */
 
-//Scrap the JComboBox to switch panels. Have one giant panel instead.
-
 public class CalcFrame extends JFrame {
 	
 	private static final long serialVersionUID = 1L;
@@ -24,7 +22,6 @@ public class CalcFrame extends JFrame {
 	private JPanel basicOpsPanel;
 	
 	private JTextField display;
-	
 	
 	private JPanel innerDisplayPanel;
 	private JPanel innerStandPanel;
@@ -70,6 +67,10 @@ public class CalcFrame extends JFrame {
 	private JButton subtractBtn;
 	private JButton addBtn;
 	private JButton equalsBtn;
+	
+	private Font displayFont;
+	private Font numPadFont;
+	private Font operatorFont;
 	
 	private GridBagConstraints outerGBC;
 	private GridBagConstraints innerGBC;
@@ -133,6 +134,10 @@ public class CalcFrame extends JFrame {
 		addBtn = new JButton("+");
 		equalsBtn = new JButton("=");
 		
+		displayFont = new Font("Consolas", Font.PLAIN, 22);   
+		numPadFont = new Font("Arial", Font.BOLD, 14);
+		operatorFont = new Font("Arial", Font.BOLD, 20);
+		
 		outerGBC = new GridBagConstraints();
 		innerGBC = new GridBagConstraints();
 		standGBC = new GridBagConstraints();
@@ -194,6 +199,7 @@ public class CalcFrame extends JFrame {
 		display.setAlignmentY(Component.CENTER_ALIGNMENT);
 		display.setHorizontalAlignment(SwingConstants.RIGHT);
 		display.setBackground(Color.LIGHT_GRAY);
+		display.setFont(displayFont);
 		display.setEditable(false);
 		
 		innerDisplayPanel.add(display);
@@ -497,6 +503,11 @@ public class CalcFrame extends JFrame {
 			}
 			
 		};
+		
+		eBtn.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+				KeyStroke.getKeyStroke(KeyEvent.VK_E, 0), "e");
+		eBtn.getActionMap().put("e", eAction);
+		
 		eBtn.addActionListener(eAction);
 		innerAdvPanel.add(eBtn, advGBC);
 		
@@ -623,6 +634,7 @@ public class CalcFrame extends JFrame {
 		innerNumPanel.add(decimalBtn, numGBC);
 		
 		setGBC(numGBC, 2, 3, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
+		changeSignsBtn.setFont(numPadFont);
 		Action changeSignsBtnAction = new AbstractAction() {
 
 			/**
@@ -694,6 +706,7 @@ public class CalcFrame extends JFrame {
 		
 		setGBC(basGBC, 0, 4, 1, 1, 1, 1, GridBagConstraints.BOTH, 0, 0);
 		equalsBtn.setBackground(new Color(119, 255, 0));
+		equalsBtn.setFont(operatorFont);
 		
 		Action equalsAction = new AbstractAction() {
 
@@ -750,6 +763,8 @@ public class CalcFrame extends JFrame {
 			int vkNum, int vkNumpadNum, String vkName
 			) {
 		
+		numBtn.setFont(numPadFont);
+		
 		Action numBtnAction = new AbstractAction() {
 
 			/**
@@ -785,6 +800,8 @@ public class CalcFrame extends JFrame {
 			int vkOp, int vkNumpadOp, 
 			String vkName
 			) {
+		
+		operatorBtn.setFont(operatorFont);
 		
 		Action operatorAction = new AbstractAction() {
 
